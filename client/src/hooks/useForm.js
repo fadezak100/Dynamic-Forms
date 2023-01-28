@@ -5,10 +5,12 @@ import { useState } from 'react';
 import individualAPI from '../api/individual';
 import businessAPI from '../api/business';
 
+import validationSchemas from '../validation/schemas';
+
 export const useForm = (args = {}) => {
   const [form, setForm] = useState(args);
   const [type, setType] = useState('');
-  const [validator, setValidator] = useState({});
+  const [validator, setValidator] = useState([]);
 
   const setValue = (event, field = null) => {
     const name = field ?? event?.target.name;
@@ -18,33 +20,43 @@ export const useForm = (args = {}) => {
     } catch (e) {}
   };
 
-  const validation = () => {
-    const _validator = {};
-
-    for (let el in form) {
-      if (form[el] === null || form[el]?.trim() === '') {
-        _validator[el] = `${el} is required`;
-      }
-    }
-    setValidator({ ..._validator });
-    return Object.keys(validator).length === 0;
+  const typeOfUser = {
+    individual: {
+      schema: validationSchemas.createIndividualSchema,
+      api: () => {
+        individualAPI
+          .register(form)
+          .then(() => toast.success('Registered'))
+          .catch(() => toast.error('Internal server error'));
+      },
+    },
+    business: {
+      schema: validationSchemas.createBusinessSchema,
+      api: () => {
+        businessAPI
+          .register(form)
+          .then(() => toast.success('Registered'))
+          .catch(() => toast.error('Internal server error'));
+      },
+    },
   };
 
   const submit = (event) => {
     event.preventDefault();
-    validation();
-    if (type === 'individual') {
-      individualAPI
-        .register(form)
-        .then((res) => toast.success('Registered'))
-        .catch((error) => toast.error('Internal server error'));
-    } else {
-      businessAPI
-        .register(form)
-        .then((res) => toast.success('Registered'))
-        .catch((error) => toast.error('Internal server error'));
-    }
+
+    typeOfUser[type].schema
+      .validate(form, { abortEarly: false })
+      .then(typeOfUser[type].api)
+      .catch((err) => {
+        const errors = err.inner.map((e) => {
+          return {
+            name: e.path,
+            message: e.message,
+          };
+        });
+        setValidator(errors);
+      });
   };
 
-  return { form, setValue, validator, submit, setType };
+  return { setValue, validator, submit, setType };
 };

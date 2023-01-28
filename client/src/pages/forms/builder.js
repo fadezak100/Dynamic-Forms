@@ -1,5 +1,8 @@
 import { ToastContainer, toast } from 'react-toastify';
 
+import * as yup from 'yup';
+import validationSchema from '../../validation/schemas';
+
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,11 +27,14 @@ const FormBuilder = () => {
   }
 
   builder.forEach((el) => {
-    console.log(el);
     formFields[el.name] = el.attributes?.value ?? '';
   });
 
   const { setValue, validator, submit, setType } = useForm(formFields);
+
+  const handleChanges = (event, el) => {
+    setValue(event, el.name);
+  };
 
   useEffect(() => {
     if (type !== '') {
@@ -47,12 +53,18 @@ const FormBuilder = () => {
                 <div>
                   {React.createElement(el.component, {
                     ...el.attributes,
-                    onChange: (event) => setValue(event, el.name),
+                    onChange: (e) => handleChanges(e, el),
                   })}
                 </div>
                 <div className="validator">
-                  {validator[el.name] && (
-                    <ValidationError message={validator[el.name]} />
+                  {validator.find((validate) => validate.name === el.name)
+                    ?.message && (
+                    <ValidationError
+                      message={
+                        validator.find((validate) => validate.name === el.name)
+                          ?.message
+                      }
+                    />
                   )}
                 </div>
               </div>
