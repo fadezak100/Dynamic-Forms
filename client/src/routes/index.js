@@ -1,5 +1,5 @@
 import Home from '../pages/home/home';
-import FormBuilder from '../pages/forms/builder';
+import FormBuilder from '../pages/forms';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default [

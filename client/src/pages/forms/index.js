@@ -1,7 +1,4 @@
-import { ToastContainer, toast } from 'react-toastify';
-
-import * as yup from 'yup';
-import validationSchema from '../../validation/schemas';
+import { ToastContainer } from 'react-toastify';
 
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
