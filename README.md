@@ -17,5 +17,4 @@ Simple web application to implement dynamic forms along with user authentication
 - Used Toast for server error handling.
 
 ## Notes:
-- The user's inputs, for now, are validated using a simple pure validator, I will implement validation using Yup and Formick letters.
 - The forms that can be generated are the Registration forms for both individual and business accounts.
